@@ -118,3 +118,7 @@ class TestOfCommandPatterns(TestCase):
         target, match = one.match('sup')
         self.assertEqual(target, test_fn, "should match the second set as well")
 
+class TestOfMultipleCommandPatterns(TestCase):
+    def test_is_a_subclass_of_CommandPatterns(self):
+        p = patterns.MultipleCommandPatterns()
+        self.assert_(isinstance(p, patterns.CommandPatterns))

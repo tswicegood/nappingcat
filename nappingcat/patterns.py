@@ -3,7 +3,7 @@ from nappingcat.exceptions import NappingCatUnhandled, NappingCatBadPatterns
 import re
 
 class CommandPatterns(object):
-    def __init__(self, path, map):
+    def __init__(self, path=None, map=[]):
         self.path, self.map = path, map
         if self.path:
             self.module = import_module(self.path)
@@ -30,21 +30,28 @@ class CommandPatterns(object):
         raise NappingCatUnhandled("This cat doesn't understand %s." % command)
 
     def __add__(self, other):
-        return MultipleCommandPatterns(self, other)
+        ret = MultipleCommandPatterns()
+        ret.add_pattern(self)
+        ret.add_pattern(other)
+        return ret
 
-class MultipleCommandPatterns(object):
-    def __init__(self, *args):
-        self.patterns = list(args)
+class MultipleCommandPatterns(CommandPatterns):
+    def __init__(self, *args, **kwargs):
+        super(MultipleCommandPatterns, self).__init__(*args, **kwargs)
+        self.patterns = []
 
     def add_pattern(self, pattern):
         self.patterns.append(pattern)
 
     def match(self, command):
-        for pattern in self.patterns:
-            try:
-                return pattern.match(command)
-            except NappingCatUnhandled, e:
-                pass
+        try:
+            return super(MultipleCommandPatterns, self).match(command)
+        except NappingCatUnhandled, e:
+            for pattern in self.patterns:
+                try:
+                    return pattern.match(command)
+                except NappingCatUnhandled, e:
+                    pass
         raise e
 
 def include(path):
