@@ -29,6 +29,24 @@ class CommandPatterns(object):
                     return results
         raise NappingCatUnhandled("This cat doesn't understand %s." % command)
 
+    def __add__(self, other):
+        return MultipleCommandPatterns(self, other)
+
+class MultipleCommandPatterns(object):
+    def __init__(self, *args):
+        self.patterns = list(args)
+
+    def add_pattern(self, pattern):
+        self.patterns.append(pattern)
+
+    def match(self, command):
+        for pattern in self.patterns:
+            try:
+                return pattern.match(command)
+            except NappingCatUnhandled, e:
+                pass
+        raise e
+
 def include(path):
     router_module = import_module(path)
     cmdpatterns = getattr(router_module, 'cmdpatterns')

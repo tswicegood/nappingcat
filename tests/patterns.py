@@ -65,4 +65,56 @@ class TestOfCommandPatterns(TestCase):
         ])
         self.assertRaises(NappingCatBadPatterns, pat.match, 'hey')
 
+    def test_two_CommandPatterns_objects_can_be_added_together(self):
+        one = patterns.CommandPatterns('tests.patterns', [
+            (r'^hey', 'test_fn'),
+            (r'^you!', 'dne'),
+        ])
+
+        two = patterns.CommandPatterns('tests.patterns', [
+            (r'^sup', 'test_fn'),
+            (r'^dawn?', 'dne'),
+        ])
+
+        both = one + two
+
+        target, match = both.match('hey')
+        self.assertEqual(target, test_fn)
+
+        target, match = both.match('sup')
+        self.assertEqual(target, test_fn, "should match the second set as well")
+
+    def test_added_CommandPatterns_still_raise_exceptions_if_they_cannot_find_the_command(self):
+        one = patterns.CommandPatterns('tests.patterns', [
+            (r'^hey', 'test_fn'),
+            (r'^you!', 'dne'),
+        ])
+
+        two = patterns.CommandPatterns('tests.patterns', [
+            (r'^sup', 'test_fn'),
+            (r'^dawn?', 'dne'),
+        ])
+
+        both = one + two
+
+        self.assertRaises(NappingCatUnhandled, both.match, "What's up?")
+
+    def test_can_append_to_an_existing_pattern(self):
+        one = patterns.CommandPatterns('tests.patterns', [
+            (r'^hey', 'test_fn'),
+            (r'^you!', 'dne'),
+        ])
+
+        two = patterns.CommandPatterns('tests.patterns', [
+            (r'^sup', 'test_fn'),
+            (r'^dawn?', 'dne'),
+        ])
+
+        one += two
+
+        target, match = one.match('hey')
+        self.assertEqual(target, test_fn)
+
+        target, match = one.match('sup')
+        self.assertEqual(target, test_fn, "should match the second set as well")
 
