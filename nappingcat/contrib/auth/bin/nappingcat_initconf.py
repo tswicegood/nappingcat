@@ -27,7 +27,7 @@ def main(username=None):
     output_to = os.path.expanduser('~%s/nappingcat.conf' % username)
     git_executable = which('git')
     if git_executable is None:
-        print "\033[0;31mYou don't have `git` installed on path. This'll make kittygit fairly useless.\033[0m\n" % output_to
+        print "\033[0;31mYou don't have `git` installed on path. This'll make kittygit fairly useless.\033[0m\n"
     if not os.path.isfile(output_to):
         try:
             with open(output_to, 'w') as output:
